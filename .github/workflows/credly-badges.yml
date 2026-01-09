@@ -1,0 +1,33 @@
+name: Update Credly Badges
+
+on:
+  schedule:
+    # Run weekly on Sundays at 00:00 UTC
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+    # Allow manual trigger
+
+jobs:
+  update-badges:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Update Credly Badges in README
+        uses: badges/readme@main
+        with:
+          # Configuration for Credly badges
+          credly: aiexxplorer
+          datafile: badges-data.json
+      
+      - name: Commit and push if changed
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          if [[ `git status --porcelain` ]]; then
+            git add -A
+            git commit -m "chore: update credly badges"
+            git push
+          fi
