@@ -5,19 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Credly Badges</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: transparent; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .badges { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; max-width: 1200px; }
-        .badge { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit; transition: transform 0.3s ease; }
-        .badge:hover { transform: translateY(-5px); }
-        .badge-img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; background: transparent; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .badge:hover .badge-img { box-shadow: 0 8px 12px rgba(0,0,0,0.2); }
-        .badge-name { text-align: center; font-size: 12px; font-weight: 500; color: #333; max-width: 120px; margin-top: 10px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            max-width: 1200px;
+        }
+        
+        .badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.3s ease;
+        }
+        
+        .badge:hover {
+            transform: translateY(-5px);
+        }
+        
+        .badge-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: transparent;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.05));
+        }
+        
+        .badge:hover .badge-img {
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .badge-name {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 500;
+            color: #333;
+            max-width: 120px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="badges" id="badges-container"></div>
+    
     <script>
+        // Fetch badges from README.md or use hardcoded data as fallback
         const badgesData = [
             { name: 'Foundational C# with Microsoft', img: 'https://images.credly.com/size/680x680/images/a85c3da2-b8c3-4c75-8463-8c4d221dfdc9/image.png' },
             { name: 'Google Cloud Digital Leader', img: 'https://images.credly.com/size/680x680/images/75a937f8-2016-4c11-a72d-8e6b9ce0ebca/image.png' },
@@ -26,6 +79,7 @@
             { name: 'Professional Cloud Architect', img: 'https://images.credly.com/size/680x680/images/08216781-93cb-4ba1-8110-8eb3f60e21d4/image.png' },
             { name: 'Cloud Digital Leader', img: 'https://images.credly.com/size/680x680/images/0e284c3f-5164-4b21-8660-0d8fb3c32bbd/image.png' }
         ];
+        
         const container = document.getElementById('badges-container');
         badgesData.forEach(badge => {
             const link = document.createElement('a');
