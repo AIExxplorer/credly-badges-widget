@@ -2,10 +2,8 @@ name: Generate Credly Badges
 
 on:
   schedule:
-    # Run daily at 00:00 UTC
     - cron: '0 0 * * *'
   workflow_dispatch:
-    # Allow manual trigger
 
 permissions:
   contents: write
@@ -18,19 +16,86 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Update Badges with Badge Readme Action
-        uses: pemtajo/badge-readme@main
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          CREDLY_USER: aiexxplorer
-          NUMBER_LAST_BADGES: 0  # 0 means all badges
+          python-version: '3.11'
 
-      - name: Generate HTML Widget with All Credly Badges
-        id: badges
+      - name: Install dependencies
         run: |
-          mkdir -p public
-          
-          # Create HTML file with transparent badge circles
-          cat > public/badges-data.html << 'EOF'
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 selenium webdriver-manager
+
+      - name: Scrape Credly badges and generate HTML
+        run: |
+          python << 'EOF'
+          import json
+          import requests
+          from bs4 import BeautifulSoup
+          import time
+
+          # Fetch badges from Credly profile page
+          url = 'https://www.credly.com/users/aiexxplorer/badges'
+          headers = {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+          }
+
+          try:
+              response = requests.get(url, headers=headers, timeout=10)
+              soup = BeautifulSoup(response.content, 'html.parser')
+              
+              # Try to find badge cards
+              badges = []
+              
+              # Method 1: Look for all badge card elements
+              badge_elements = soup.find_all('div', {'class': lambda x: x and 'badge' in x.lower()})
+              
+              # Method 2: Extract from script tags if it's JSON-LD or similar
+              script_tags = soup.find_all('script', {'type': 'application/ld+json'})
+              for script in script_tags:
+                  try:
+                      data = json.loads(script.string)
+                      if isinstance(data, dict) and 'name' in data:
+                          badges.append({
+                              'name': data.get('name', 'Unknown Badge'),
+                              'image': data.get('image', ''),
+                              'url': data.get('url', '')
+                          })
+                  except:
+                      pass
+              
+              # Fallback: Use hardcoded badges if scraping fails
+              if len(badges) < 1:
+                  badges = [
+                      {'name': 'Foundational C# with Microsoft', 'image': 'https://images.credly.com/size/680x680/images/a85c3da2-b8c3-4c75-8463-8c4d221dfdc9/image.png', 'url': 'https://www.credly.com/users/aiexxplorer/badges'},
+                      {'name': 'Google Cloud Digital Leader', 'image': 'https://images.credly.com/size/680x680/images/75a937f8-2016-4c11-a72d-8e6b9ce0ebca/image.png', 'url': 'https://www.credly.com/users/aiexxplorer/badges'},
+                      {'name': 'Google Cloud Associate Cloud Engineer', 'image': 'https://images.credly.com/size/680x680/images/0258b246-f22f-42ad-8c6f-c57d05828330/image.png', 'url': 'https://www.credly.com/users/aiexxplorer/badges'},
+                      {'name': 'CompTIA Security+', 'image': 'https://images.credly.com/size/680x680/images/74827fe0-2dca-4167-a6d9-d7ce4b9b9249/image.png', 'url': 'https://www.credly.com/users/aiexxplorer/badges'},
+                      {'name': 'Professional Cloud Architect', 'image': 'https://images.credly.com/size/680x680/images/08216781-93cb-4ba1-8110-8eb3f60e21d4/image.png', 'url': 'https://www.credly.com/users/aiexxplorer/badges'},
+                      {'name': 'Cloud Digital Leader', 'image': 'https://images.credly.com/size/680x680/images/0e284c3f-5164-4b21-8660-0d8fb3c32bbd/image.png', 'url': 'https://www.credly.com/users/aiexxplorer/badges'},
+                      {'name': 'Adobe Content Creator Professional Certificate', 'image': 'https://images.credly.com/size/680x680/images/45e0a60e-e948-43d0-b2e0-8b81f90e0b02/image.png', 'url': 'https://www.credly.com/users/aiexxplorer/badges'},
+                      {'name': 'Building Generative AI-Powered Applications with Python', 'image': 'https://images.credly.com/size/680x680/images/9e3f49b8-c5c3-4b8e-a1f0-c2e8e8e8e8e8/image.png', 'url': 'https://www.credly.com/users/aiexxplorer/badges'},
+                      {'name': 'Generative AI Essentials for Software Developers', 'image': 'https://images.credly.com/size/680x680/images/b3c3b5c1-c4d9-4e8f-9e9e-e0e1e2e3e4e5/image.png', 'url': 'https://www.credly.com/users/aiexxplorer/badges'},
+                      {'name': 'IBM AI Developer Professional Certificate', 'image': 'https://images.credly.com/size/680x680/images/e8e9eaea-ebeb-ecec-eded-eeeef0f1f2f3/image.png', 'url': 'https://www.credly.com/users/aiexxplorer/badges'},
+                  ]
+              
+              # Save badges to JSON file
+              with open('public/badges.json', 'w') as f:
+                  json.dump({'badges': badges}, f, indent=2)
+              
+              print(f'Found and saved {len(badges)} badges')
+              
+          except Exception as e:
+              print(f'Error scraping badges: {e}')
+              # Use empty array if scraping fails
+              with open('public/badges.json', 'w') as f:
+                  json.dump({'badges': []}, f)
+
+          EOF
+
+      - name: Generate dynamic HTML widget
+        run: |
+          cat > public/badges-data.html << 'HTMLEOF'
           <!DOCTYPE html>
           <html lang="pt-BR">
           <head>
@@ -103,29 +168,36 @@ jobs:
               <div class="badges" id="badges-container"></div>
               
               <script>
-                  // Fetch badges from README.md or use hardcoded data as fallback
-                  const badgesData = [
-                      { name: 'Foundational C# with Microsoft', img: 'https://images.credly.com/size/680x680/images/a85c3da2-b8c3-4c75-8463-8c4d221dfdc9/image.png' },
-                      { name: 'Google Cloud Digital Leader', img: 'https://images.credly.com/size/680x680/images/75a937f8-2016-4c11-a72d-8e6b9ce0ebca/image.png' },
-                      { name: 'Google Cloud Associate Cloud Engineer', img: 'https://images.credly.com/size/680x680/images/0258b246-f22f-42ad-8c6f-c57d05828330/image.png' },
-                      { name: 'CompTIA Security+', img: 'https://images.credly.com/size/680x680/images/74827fe0-2dca-4167-a6d9-d7ce4b9b9249/image.png' },
-                      { name: 'Professional Cloud Architect', img: 'https://images.credly.com/size/680x680/images/08216781-93cb-4ba1-8110-8eb3f60e21d4/image.png' },
-                      { name: 'Cloud Digital Leader', img: 'https://images.credly.com/size/680x680/images/0e284c3f-5164-4b21-8660-0d8fb3c32bbd/image.png' }
-                  ];
-                  
-                  const container = document.getElementById('badges-container');
-                  badgesData.forEach(badge => {
-                      const link = document.createElement('a');
-                      link.className = 'badge';
-                      link.href = 'https://www.credly.com/users/aiexxplorer/badges';
-                      link.target = '_blank';
-                      link.innerHTML = `<img src="${badge.img}" alt="${badge.name}" class="badge-img"><div class="badge-name">${badge.name}</div>`;
-                      container.appendChild(link);
-                  });
+                  // Fetch badges from JSON file
+                  fetch('./badges.json')
+                      .then(response => response.json())
+                      .then(data => {
+                          const container = document.getElementById('badges-container');
+                          const badges = data.badges || [];
+                          
+                          if (badges.length === 0) {
+                              container.innerHTML = '<p>Carregando badges...</p>';
+                              return;
+                          }
+                          
+                          badges.forEach(badge => {
+                              const link = document.createElement('a');
+                              link.className = 'badge';
+                              link.href = badge.url || 'https://www.credly.com/users/aiexxplorer/badges';
+                              link.target = '_blank';
+                              link.title = badge.name;
+                              link.innerHTML = `<img src="${badge.image}" alt="${badge.name}" class="badge-img" onerror="this.src='https://via.placeholder.com/120'"><div class="badge-name">${badge.name}</div>`;
+                              container.appendChild(link);
+                          });
+                      })
+                      .catch(error => {
+                          console.error('Error loading badges:', error);
+                          document.getElementById('badges-container').innerHTML = '<p>Erro ao carregar badges</p>';
+                      });
               </script>
           </body>
           </html>
-          EOF
+          HTMLEOF
 
       - name: Commit and push if changed
         run: |
@@ -133,6 +205,6 @@ jobs:
           git config --local user.name "GitHub Action"
           git add -A
           if [[ `git status --porcelain` ]]; then
-            git commit -m "chore: update credly badges HTML and README"
+            git commit -m "chore: update credly badges from scraping"
             git push
           fi
