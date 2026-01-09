@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credly Badges Widget</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .badges-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            max-width: 1000px;
+        }
+
+        .badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .badge:hover {
+            transform: translateY(-5px);
+        }
+
+        .badge-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: transparent;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .badge:hover .badge-image {
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .badge-name {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 500;
+            color: #333;
+            max-width: 120px;
+            word-wrap: break-word;
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .error {
+            text-align: center;
+            font-size: 16px;
+            color: #d32f2f;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="badges-container" class="badges-container">
+        <div class="loading">Carregando badges...</div>
+    </div>
+
+    <script>
+        async function fetchCrewlyBadges() {
+            const username = 'aiexxplorer';
+            const credlyBaseUrl = 'https://www.credly.com/users/' + username + '/badges';
+            
+            try {
+                // Fallback: hardcoded badges from the Credly profile
+                const fallbackBadges = [
+                    {
+                        name: 'Foundational C# with Microsoft',
+                        image: 'https://images.credly.com/size/680x680/images/a85c3da2-b8c3-4c75-8463-8c4d221dfdc9/image.png'
+                    },
+                    {
+                        name: 'Google Cloud Digital Leader',
+                        image: 'https://images.credly.com/size/680x680/images/75a937f8-2016-4c11-a72d-8e6b9ce0ebca/image.png'
+                    },
+                    {
+                        name: 'Google Cloud Associate Cloud Engineer',
+                        image: 'https://images.credly.com/size/680x680/images/0258b246-f22f-42ad-8c6f-c57d05828330/image.png'
+                    },
+                    {
+                        name: 'CompTIA Security+',
+                        image: 'https://images.credly.com/size/680x680/images/74827fe0-2dca-4167-a6d9-d7ce4b9b9249/image.png'
+                    },
+                    {
+                        name: 'Professional Cloud Architect',
+                        image: 'https://images.credly.com/size/680x680/images/08216781-93cb-4ba1-8110-8eb3f60e21d4/image.png'
+                    },
+                    {
+                        name: 'Cloud Digital Leader',
+                        image: 'https://images.credly.com/size/680x680/images/0e284c3f-5164-4b21-8660-0d8fb3c32bbd/image.png'
+                    }
+                ];
+                
+                renderBadges(fallbackBadges);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function renderBadges(badges) {
+            const container = document.getElementById('badges-container');
+            container.innerHTML = '';
+
+            if (badges.length === 0) {
+                container.innerHTML = '<div class="error">Nenhum badge encontrado</div>';
+                return;
+            }
+
+            badges.forEach((badge, index) => {
+                const badgeElement = document.createElement('a');
+                badgeElement.className = 'badge';
+                badgeElement.href = 'https://www.credly.com/users/aiexxplorer/badges';
+                badgeElement.target = '_blank';
+                badgeElement.rel = 'noopener noreferrer';
+
+                const imageUrl = badge.image || badge.badge_template?.image_url || badge.image_url || '';
+                const badgeName = badge.name || badge.badge_template?.name || 'Badge';
+
+                badgeElement.innerHTML = `
+                    <img src="${imageUrl}" alt="${badgeName}" class="badge-image" onerror="this.style.display='none'">
+                    <div class="badge-name">${badgeName}</div>
+                `;
+
+                container.appendChild(badgeElement);
+            });
+        }
+
+        // Load badges when page loads
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', fetchCrewlyBadges);
+        } else {
+            fetchCrewlyBadges();
+        }
+    </script>
+</body>
+</html>
