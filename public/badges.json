@@ -1,3 +1,54 @@
 {
-  "badges": []
+  "badges": [
+    {
+      "name": "Foundational C# with Microsoft",
+      "image": "https://images.credly.com/size/680x680/images/a85c3da2-b8c3-4c75-8463-8c4d221dfdc9/image.png",
+      "url": "https://www.credly.com/users/aiexxplorer/badges"
+    },
+    {
+      "name": "Google Cloud Digital Leader",
+      "image": "https://images.credly.com/size/680x680/images/75a937f8-2016-4c11-a72d-8e6b9ce0ebca/image.png",
+      "url": "https://www.credly.com/users/aiexxplorer/badges"
+    },
+    {
+      "name": "Google Cloud Associate Cloud Engineer",
+      "image": "https://images.credly.com/size/680x680/images/0258b246-f22f-42ad-8c6f-c57d05828330/image.png",
+      "url": "https://www.credly.com/users/aiexxplorer/badges"
+    },
+    {
+      "name": "CompTIA Security+",
+      "image": "https://images.credly.com/size/680x680/images/74827fe0-2dca-4167-a6d9-d7ce4b9b9249/image.png",
+      "url": "https://www.credly.com/users/aiexxplorer/badges"
+    },
+    {
+      "name": "Professional Cloud Architect",
+      "image": "https://images.credly.com/size/680x680/images/08216781-93cb-4ba1-8110-8eb3f60e21d4/image.png",
+      "url": "https://www.credly.com/users/aiexxplorer/badges"
+    },
+    {
+      "name": "Cloud Digital Leader",
+      "image": "https://images.credly.com/size/680x680/images/0e284c3f-5164-4b21-8660-0d8fb3c32bbd/image.png",
+      "url": "https://www.credly.com/users/aiexxplorer/badges"
+    },
+    {
+      "name": "Adobe Content Creator Professional Certificate",
+      "image": "https://images.credly.com/size/680x680/images/45e0a60e-e948-43d0-b2e0-8b81f90e0b02/image.png",
+      "url": "https://www.credly.com/users/aiexxplorer/badges"
+    },
+    {
+      "name": "Building Generative AI-Powered Applications with Python",
+      "image": "https://images.credly.com/size/680x680/images/9e3f49b8-c5c3-4b8e-a1f0-c2e8e8e8e8e8/image.png",
+      "url": "https://www.credly.com/users/aiexxplorer/badges"
+    },
+    {
+      "name": "Generative AI Essentials for Software Developers",
+      "image": "https://images.credly.com/size/680x680/images/b3c3b5c1-c4d9-4e8f-9e9e-e0e1e2e3e4e5/image.png",
+      "url": "https://www.credly.com/users/aiexxplorer/badges"
+    },
+    {
+      "name": "IBM AI Developer Professional Certificate",
+      "image": "https://images.credly.com/size/680x680/images/e8e9eaea-ebeb-ecec-eded-eeeef0f1f2f3/image.png",
+      "url": "https://www.credly.com/users/aiexxplorer/badges"
+    }
+  ]
 }
