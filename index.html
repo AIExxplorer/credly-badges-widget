@@ -5,19 +5,180 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Credly Badges Widget</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #f0f0f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .container { width: 100%; max-width: 1200px; }
-        h1 { text-align: center; margin-bottom: 10px; color: #333; }
-        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
-        iframe { width: 100%; height: 600px; border: none; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1400px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .badges-table {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            padding: 40px;
+        }
+        
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 30px;
+            justify-items: center;
+        }
+        
+        .badge-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .badge-item:hover {
+            transform: translateY(-10px);
+        }
+        
+        .badge-img {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: transparent;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            border: 3px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+        
+        .badge-item:hover .badge-img {
+            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+        
+        .badge-name {
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            max-width: 140px;
+            margin-top: 15px;
+            line-height: 1.4;
+        }
+        
+        .badge-item:hover .badge-name {
+            color: #667eea;
+        }
+        
+        @media (max-width: 768px) {
+            .badges-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 20px;
+            }
+            
+            .badge-img {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .badge-name {
+                font-size: 11px;
+            }
+            
+            .badges-table {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎓 Meus Badges Credly</h1>
-        <p class="subtitle">Atualizado automaticamente via GitHub Actions</p>
-        <iframe src="./public/badges-data.html" title="Credly Badges"></iframe>
+        <div class="header">
+            <h1>🎓 Meus Badges Credly</h1>
+            <p>Atualizado automaticamente via GitHub Actions</p>
+        </div>
+        
+        <div class="badges-table">
+            <div class="badges-grid" id="badges-container"></div>
+        </div>
     </div>
+    
+    <script>
+        // Fetch badges from JSON file
+        fetch('./public/badges.json')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('badges-container');
+                const badges = data.badges || [];
+                
+                if (badges.length === 0) {
+                    container.innerHTML = '<p>Carregando badges...</p>';
+                    return;
+                }
+                
+                badges.forEach(badge => {
+                    const link = document.createElement('a');
+                    link.className = 'badge-item';
+                    link.href = badge.url || 'https://www.credly.com/users/aiexxplorer/badges';
+                    link.target = '_blank';
+                    link.title = badge.name;
+                    
+                    const img = document.createElement('img');
+                    img.src = badge.image;
+                    img.alt = badge.name;
+                    img.className = 'badge-img';
+                    img.onerror = function() { this.src = 'https://via.placeholder.com/140'; };
+                    
+                    const nameDiv = document.createElement('div');
+                    nameDiv.className = 'badge-name';
+                    nameDiv.textContent = badge.name;
+                    
+                    link.appendChild(img);
+                    link.appendChild(nameDiv);
+                    container.appendChild(link);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading badges:', error);
+                document.getElementById('badges-container').innerHTML = '<p>Erro ao carregar badges</p>';
+            });
+    </script>
 </body>
 </html>
